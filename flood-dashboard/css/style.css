@@ -320,6 +320,225 @@ code {
 
 .main-map-head { flex-wrap: wrap; }
 
+/* ---------------- Leaflet map container ---------------- */
+#map {
+  flex: 1;
+  min-height: 420px;
+  width: 100%;
+  background: var(--surface-2);
+  z-index: 0;
+}
+
+/* ---------------- Timeline slider ---------------- */
+.timeline-bar {
+  padding: 14px 16px 12px;
+  border-top: 1px solid var(--line);
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.timeline-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.timeline-label-text {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--ink-dim);
+}
+
+.timeline-active-label {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--amber);
+  letter-spacing: 0.02em;
+}
+
+.timeline-slider-wrap {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.timeline-tick {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--ink-dim);
+  white-space: nowrap;
+  letter-spacing: 0.03em;
+}
+
+.timeline-slider {
+  width: 100%;
+  cursor: pointer;
+  accent-color: var(--amber);
+  height: 4px;
+  transition: opacity 0.2s ease;
+}
+
+.timeline-slider:active {
+  opacity: 0.85;
+}
+
+/* Pulse the thumb when dragging — webkit */
+.timeline-slider:active::-webkit-slider-thumb {
+  animation: thumb-pulse 0.4s ease;
+}
+@keyframes thumb-pulse {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.5); box-shadow: 0 0 0 6px rgba(242,169,59,0.25); }
+  100% { transform: scale(1); }
+}
+
+.timeline-slider:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 3px;
+}
+
+/* ---------------- Map legend (inside map section) ---------------- */
+.map-legend {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 10px 16px;
+  border-top: 1px solid var(--line);
+  background: rgba(11, 18, 32, 0.5);
+  font-size: 0.73rem;
+}
+
+.map-legend-title {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--ink-dim);
+  margin-right: 4px;
+}
+
+.map-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink-dim);
+}
+
+.map-swatch {
+  display: inline-block;
+  width: 14px;
+  height: 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+  opacity: 0.85;
+}
+
+/* ---------------- Leaflet popup theming ---------------- */
+.leaflet-popup-content-wrapper {
+  background: var(--surface) !important;
+  border: 1px solid var(--line) !important;
+  border-radius: var(--radius) !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5) !important;
+  color: var(--ink) !important;
+}
+
+.leaflet-popup-tip {
+  background: var(--surface) !important;
+}
+
+.leaflet-popup-close-button {
+  color: var(--ink-dim) !important;
+}
+
+.lf-popup {
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  min-width: 180px;
+  color: var(--ink);
+}
+
+.lf-popup-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.92rem;
+  margin-bottom: 8px;
+  color: var(--ink);
+}
+
+.lf-popup-row {
+  margin-bottom: 4px;
+  color: var(--ink);
+  line-height: 1.4;
+}
+
+.lf-popup-note {
+  color: var(--ink-dim);
+  font-size: 0.76rem;
+  margin-top: 6px;
+  line-height: 1.4;
+}
+
+.lf-popup-time {
+  margin-top: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--ink-dim);
+  letter-spacing: 0.02em;
+}
+
+/* Leaflet attribution dark theme */
+.leaflet-control-attribution {
+  background: rgba(11,18,32,0.75) !important;
+  color: var(--ink-dim) !important;
+  backdrop-filter: blur(2px);
+}
+.leaflet-control-attribution a { color: var(--amber) !important; }
+
+/* Leaflet zoom buttons dark theme */
+.leaflet-bar a {
+  background: var(--surface) !important;
+  color: var(--ink) !important;
+  border-color: var(--line) !important;
+}
+.leaflet-bar a:hover {
+  background: var(--surface-2) !important;
+}
+
+/* ---------------- Sidebar refresh button (smaller variant) ---------------- */
+.refresh-btn-sidebar {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.78rem;
+  color: #0B1220;
+  background: var(--amber);
+  border: none;
+  border-radius: 999px;
+  padding: 7px 14px 7px 11px;
+  cursor: pointer;
+  box-shadow: 0 3px 12px rgba(242, 169, 59, 0.3);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+.refresh-btn-sidebar:hover {
+  background: #FFC163;
+  transform: translateY(-1px);
+}
+.refresh-btn-sidebar:active { transform: translateY(0px) scale(0.97); }
+.refresh-btn-sidebar svg { transition: transform 0.4s ease; }
+.refresh-btn-sidebar.spinning-sidebar svg {
+  animation: spin-once 0.5s ease;
+}
+
 /* ==========================================================
    FOOTER
    ========================================================== */
@@ -377,7 +596,10 @@ code {
   }
   .sidebar .panel { min-width: 300px; flex: 1; }
   .main-map-section { min-height: 420px; }
-  .frame-viewport-main { min-height: 380px; }
+  #map { min-height: 340px; }
+  .timeline-slider-wrap {
+    grid-template-columns: auto 1fr auto auto;
+  }
 }
 
 @media (max-width: 640px) {
@@ -386,6 +608,8 @@ code {
   .layout { padding: 12px; gap: 12px; }
   .sidebar { flex-direction: column; }
   .app-footer { padding: 12px 16px 16px; }
+  #map { min-height: 280px; }
+  .map-legend { gap: 10px; font-size: 0.68rem; }
 }
 
 /* Visible keyboard focus */

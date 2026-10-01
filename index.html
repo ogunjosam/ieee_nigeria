@@ -4,12 +4,16 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Lokoja Flood Operations &mdash; Situational Dashboard</title>
-<meta name="description" content="Flood disaster management dashboard for Lokoja, Kogi State: pre-flood reference imagery, rainfall forecast, flood extent, road access, and field volunteer status, stepped frame-by-frame via Refresh." />
+<meta name="description" content="Flood disaster management dashboard for Lokoja, Kogi State: interactive GeoJSON flood event map with timeline slider, pre-flood reference imagery, and rainfall forecast." />
 
 <!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<!-- Leaflet -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 
 <link rel="stylesheet" href="css/style.css" />
 </head>
@@ -39,15 +43,15 @@
         <dd id="tm-alerts">&mdash;</dd>
       </div>
       <div class="telemetry-item">
-        <dt>This hour</dt>
+        <dt>Flood event</dt>
         <dd id="tm-peak-rain">&mdash;</dd>
       </div>
       <div class="telemetry-item">
-        <dt>Cumulative rain</dt>
+        <dt>Flood area</dt>
         <dd id="tm-flood-area">&mdash;</dd>
       </div>
       <div class="telemetry-item">
-        <dt>Frame</dt>
+        <dt>Severity</dt>
         <dd id="tm-sync">&mdash;</dd>
       </div>
     </dl>
@@ -81,29 +85,52 @@
           <img id="precipImg" src="images/precip/01.png" alt="Hourly precipitation intensity over the area of interest" />
         </div>
         <p class="panel-note" id="precip-summary">Frame 1 of 8.</p>
+        <div style="padding: 0 14px 14px;">
+          <button id="refreshBtn" class="refresh-btn-sidebar" type="button" aria-label="Refresh to next frame">
+            <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+              <path fill="currentColor" d="M17.65 6.35A7.95 7.95 0 0 0 12 4a8 8 0 1 0 7.75 10h-2.08A6 6 0 1 1 12 6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+            </svg>
+            Next frame
+          </button>
+        </div>
       </section>
 
     </aside>
 
-    <!-- ---------------- MAIN MAP ---------------- -->
+    <!-- ---------------- MAIN MAP (Leaflet) ---------------- -->
     <section class="main-map-section" aria-labelledby="main-map-title">
       <div class="panel-head main-map-head">
         <h2 id="main-map-title">Live operations map</h2>
         <div class="tag-group">
-          <span class="tag tag-source">Roads: OpenStreetMap</span>
-          <span class="tag tag-source">Flood extent: Sentinel</span>
+          <span class="tag tag-source">Basemap: OpenStreetMap</span>
+          <span class="tag tag-source">Flood extent: Sentinel / GIS</span>
           <span class="tag tag-source">Field status: NEMA</span>
         </div>
       </div>
-      <div class="frame-viewport frame-viewport-main">
-        <img id="mainMapImg" src="images/main-map/01.png" alt="Main operations map showing road network, flood extent, and field volunteer status points" />
-        <div class="frame-caption" id="main-caption">Day 0, 06:00 &mdash; Baseline</div>
-        <button id="refreshBtn" class="refresh-btn" type="button" aria-label="Refresh to next frame">
-          <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
-            <path fill="currentColor" d="M17.65 6.35A7.95 7.95 0 0 0 12 4a8 8 0 1 0 7.75 10h-2.08A6 6 0 1 1 12 6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
-          </svg>
-          Refresh
-        </button>
+
+      <!-- Leaflet map container -->
+      <div id="map" role="application" aria-label="Interactive flood operations map"></div>
+
+      <!-- Timeline slider -->
+      <div class="timeline-bar">
+        <div class="timeline-header">
+          <span class="timeline-label-text">Flood event timeline &mdash; 2025</span>
+          <span class="timeline-active-label" id="timeline-active-label">April 21, 2025</span>
+        </div>
+        <div class="timeline-slider-wrap">
+          <span class="timeline-tick">Apr 21</span>
+          <input type="range" id="timeline-slider" class="timeline-slider" min="0" max="2" step="1" value="0" aria-label="Select flood event" />
+          <span class="timeline-tick">Jul 15</span>
+          <span class="timeline-tick">Nov 2</span>
+        </div>
+      </div>
+
+      <!-- Map legend -->
+      <div class="map-legend" aria-label="Map legend">
+        <span class="map-legend-title">Flood extent</span>
+        <span class="map-legend-item"><span class="map-swatch" style="background:#3182bd;"></span> April 21</span>
+        <span class="map-legend-item"><span class="map-swatch" style="background:#de2d26;"></span> July 15 (peak)</span>
+        <span class="map-legend-item"><span class="map-swatch" style="background:#fd8d3c;"></span> November 2</span>
       </div>
     </section>
 
@@ -119,11 +146,11 @@
       <span class="legend-item"><span class="swatch swatch-flood"></span> Modelled flood extent</span>
     </div>
     <p class="disclaimer">
-      Demo build. Panel imagery is a pre-rendered illustrative sequence (not a live map/live tile feed) &mdash;
-      press <b>Refresh</b> to step through it. Coordinates and locality names are real; rainfall, flood-extent,
-      and volunteer-status content are illustrative placeholder data pending live NIGCOMSAT / ECMWF / Sentinel /
-      NEMA feeds &mdash; see <code>README.md</code> for integration notes and for regenerating this image
-      sequence from <code>generate_frames.py</code>.
+      Interactive GeoJSON flood map &mdash; Lokoja 2025 flood events rendered from real GIS data.
+      Use the timeline slider to switch between flood events. Sidebar imagery is a pre-rendered
+      illustrative sequence &mdash; press <b>Next frame</b> to step through it.
+      Coordinates and locality names are real; volunteer-status content is illustrative placeholder data
+      pending live NEMA feeds &mdash; see <code>README.md</code> for integration notes.
     </p>
   </footer>
 
