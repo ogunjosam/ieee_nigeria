@@ -1,0 +1,22 @@
+# Netlify configuration for the Lokoja Flood Operations Dashboard.
+# This is a plain static site (HTML/CSS/JS + data files) with no build step,
+# so there is no build command — Netlify just publishes the repo root as-is.
+
+[build]
+  # Serve the site from the repository root.
+  publish = "."
+  # No build step: files are served verbatim.
+  command = ""
+
+# Long-cache the pre-rendered image frames (they rarely change).
+[[headers]]
+  for = "/images/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+
+# Do not aggressively cache the data files so updated GeoJSON/manifest
+# shows up without a hard refresh.
+[[headers]]
+  for = "/data/*"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
